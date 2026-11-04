@@ -1,0 +1,51 @@
+
+name: Java Maven CI-CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+
+  build:
+    name: Build Java Application
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source Code
+        uses: actions/checkout@v4
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+
+      - name: Build Application
+        run: |
+          echo "BUILD STARTED"
+          mvn -B clean compile
+          echo "BUILD COMPLETED"
+
+      - name: Test Application
+        run: |
+          echo "TEST STARTED"
+          mvn -B test
+          echo "TEST COMPLETED"
+
+      - name: Package Application
+        run: |
+          echo "PACKAGE STARTED"
+          mvn -B package -DskipTests
+          echo "PACKAGE COMPLETED"
+
+      - name: Upload JAR Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: hello-world-java-package
+          path: target/hello-world-app-1.0-SNAPSHOT.jar
+          if-no-files-found: error
